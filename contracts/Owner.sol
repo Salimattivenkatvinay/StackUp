@@ -55,7 +55,11 @@ contract Owner {
         return owner;
     }
 
-    function getModerators() external view returns (mapping(address => bool)) {
-        return moderators;
-    }
+//    function getModerators() external view returns (address[]) {
+//        address [] res = new address[moderators.length];
+//        for(uint i=0; i< moderators.length; i++){
+//            res[i] = moderators[i];
+//        }
+//        return res;
+//    }
 }

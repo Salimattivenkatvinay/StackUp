@@ -24,6 +24,8 @@ contract LoanPool {
     mapping(address => uint256) public loanAmount;
     mapping(address => bool) public claimedFinalYield;
 
+    mapping(address => bool) public isCollateralDeposited;
+
     event NewParticipant(address loanPool, address participant);
     event NewBidder(
         address loanPool,
@@ -45,6 +47,7 @@ contract LoanPool {
     );
 
     constructor(
+        uint256 _maximumBidAmount, // 1,00,000 every month
         uint256 _auctionInterval,
         uint256 _auctionDuration,
         uint256 _maxParticipants,
@@ -60,7 +63,7 @@ contract LoanPool {
     }
 
 
-    function addInterest() payable {
+    function addInterest() public {
         require(
             totalParticipants + 1 <= maxParticipants,
             "Exceeds maximum number of participants !!"
@@ -70,28 +73,30 @@ contract LoanPool {
             "You have already participated in the pool !!"
         );
         uint minAmount = (collateralAmount / maxParticipants / 50) * 10 ** token.decimals();
-        // taking 2%
-        require(msg.value >= minAmount, "not enough money");
-        uint moneyToReturn = msg.value - minAmount;
-        if (moneyToReturn > 0)
-            msg.sender.transfer(moneyToReturn);
 
-//        require(
-//            token.transferFrom(
-//                msg.sender,
-//                address(this),
-//                collateralAmount * 10 ** token.decimals()
-//            ),
-//            "ERC20: transferFrom failed !!"
-//        );
-//        require(
-//            deposit(collateralAmount * 10 ** token.decimals()),
-//            "Depositing on lending pool failed !!"
-//        );
+        require(
+            token.transferFrom(
+                msg.sender,
+                address(this),
+                minAmount ** token.decimals()
+            ),
+            "ERC20: transferFrom failed !!"
+        );
 
         isParticipant[msg.sender] = true;
         totalParticipants++;
         emit NewParticipant(address(this), msg.sender);
+    }
+
+    function depositCollateral() public {
+        require(!isCollateralDeposited[msg.sender], "already done bro");
+
+        uint256 term = ((block.timestamp - poolStartTimestamp) / ((auctionInterval - auctionDuration))) + 1;
+        require(
+            deposit((collateralAmount - (term / totalParticipants) * collateralAmount) * 10 ** token.decimals()), //required collateral decreases
+            "Depositing on lending pool failed !!"
+        );
+        isCollateralDeposited[msg.sender] = true;
     }
 
     function bid(uint256 bidAmount) public {
@@ -111,12 +116,6 @@ contract LoanPool {
         require(!takenLoan[msg.sender], "You have already taken a loan !!");
 
         require(bidAmount > highestBidAmount[getAuctionCount()],
-            "Bid Amount must be greater than current bid amount and min bid amount !!"
-        );
-
-        require(
-            bidAmount >= minimumBidAmount &&
-            bidAmount > highestBidAmount[getAuctionCount()],
             "Bid Amount must be greater than current bid amount and min bid amount !!"
         );
 
@@ -150,6 +149,8 @@ contract LoanPool {
                 "Can't claim loan during the auction !!"
             );
         }
+
+        require(isCollateralDeposited[msg.sender], "deposit collateral man!!");
 
         require(
             withdraw(loanAmount[msg.sender] * 10 ** token.decimals()),
@@ -193,7 +194,7 @@ contract LoanPool {
 
         require(
             withdraw(returnAmount),
-            "Withdrawl from lending pool failed !!"
+            "WithDrawl from lending pool failed !!"
         );
 
         token.transfer(msg.sender, returnAmount);
@@ -273,8 +274,26 @@ contract LoanPool {
         ? totalParticipants - 1
         : totalParticipants
         ) *
-        auctionInterval *
-        1 hours);
+        auctionInterval);
+    }
+
+    function withdraw(uint256 amount) private returns (bool){
+        return token.transfer(
+            msg.sender,
+            amount
+        );
+    }
+
+    function deposit(uint256 amount) private returns (bool){
+        return token.transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+    }
+
+    function getPoolBalance() public view returns (uint256){
+        return address(this).balance;
     }
 
 }

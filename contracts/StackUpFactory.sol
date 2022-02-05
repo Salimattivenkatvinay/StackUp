@@ -8,12 +8,12 @@ import "./StackUpFactory.sol";
 contract StackUpFactory is Owner {
 
     uint256 public totalPools;
-    address mUsd = 0x70605Bdd16e52c86FC7031446D995Cf5c7E1b0e7;
+    address mUsd = 0x7eA390E330EDee6Fe43abadbA510C952eF98f690;
 
     event NewLoanPool(
         uint256 id,
         address loanPool,
-        uint256 collateralAmount,
+        uint256 indexed collateralAmount,
         uint256 auctionInterval,
         uint8 maxParticipants,
         address tokenAddress,
@@ -24,6 +24,7 @@ contract StackUpFactory is Owner {
     function addLoanPool(
         uint256 bidAmount, // 1,00,000 every month
         uint256 auctionInterval, // every month
+        uint256 auctionDuration,
         uint8 maxParticipants, //10 people
         address token
     ) public {
@@ -31,6 +32,7 @@ contract StackUpFactory is Owner {
         LoanPool newLoanPool = new LoanPool(
             bidAmount,
             auctionInterval,
+            auctionDuration,
             maxParticipants,
             token
         );
