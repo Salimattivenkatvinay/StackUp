@@ -3,7 +3,6 @@ pragma solidity ^0.8.7;
 
 import "./LoanPool.sol";
 import "./Owner.sol";
-import "./StackUpFactory.sol";
 
 contract StackUpFactory is Owner {
 
@@ -11,26 +10,26 @@ contract StackUpFactory is Owner {
     address mUsd = 0x7eA390E330EDee6Fe43abadbA510C952eF98f690;
 
     event NewLoanPool(
-        uint256 id,
-        address loanPool,
-        uint256 indexed collateralAmount,
-        uint256 auctionInterval,
+        uint256 id,//serial number
+        address loanPool,//chit contract
+        uint256 indexed installmentAmount,//monthly amount to be paid
+        uint256 auctionInterval,// 30 days in seconds
         uint8 maxParticipants,
-        address tokenAddress,
-        address creator,
-        uint256 createdAt
+        address tokenAddress,// USDT or some other token, rupess or anything.
+        address creator,// who created this chit
+        string status // open or closed.
     );
 
     function addLoanPool(
-        uint256 bidAmount, // 1,00,000 every month
+        uint256 installmentAmount, // 1,00,000 every month
         uint256 auctionInterval, // every month
-        uint256 auctionDuration,
+        uint256 auctionDuration, // how much aution should be op[en : maybe or 10 mins:
         uint8 maxParticipants, //10 people
-        address token
+        address token // rupee or usd
     ) public {
 
         LoanPool newLoanPool = new LoanPool(
-            bidAmount,
+            installmentAmount,
             auctionInterval,
             auctionDuration,
             maxParticipants,
@@ -49,7 +48,7 @@ contract StackUpFactory is Owner {
             maxParticipants,
             token,
             msg.sender,
-            block.timestamp
+            "OPEN"
         );
     }
 

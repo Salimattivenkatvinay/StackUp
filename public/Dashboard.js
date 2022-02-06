@@ -43,28 +43,19 @@ function getEthData() {
         .then(function (result) {
             console.log(result)
         });
-
-    mycontract.getPastEvents('NewLoanPool', {
-        fromBlock: 0,
-        toBlock: 'latest'
-    }, function(error, events){ console.log(events); })
-        .then(function(events){
-            console.log(events) // same results as the optional callback above
-        });
+    //
+    // mycontract.getPastEvents('newPoollll', {
+    //     fromBlock: 0,
+    //     toBlock: 'latest'
+    // }, function(error, events){ console.log(events); })
+    //     .then(function(events){
+    //         console.log(events) // same results as the optional callback above
+    //     });
 }
 
 $(document).ready(function () {
 
-    // myContract.getPastEvents('MyEvent', {
-    //     filter: {myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...'}, // Using an array means OR: e.g. 20 or 23
-    //     fromBlock: 0,
-    //     toBlock: 'latest'
-    // }, function(error, events){ console.log(events); })
-    // .then(function(events){
-    //     console.log(events) // same results as the optional callback above
-    // });
-
-    for (let i = 0; i < 7; i++) {
+   /* for (let i = 0; i < 7; i++) {
         $("#active_table").append(`
         <tr>
             <td>${i}</td>
@@ -76,7 +67,7 @@ $(document).ready(function () {
                 <button type="button" class="btn btn-primary">Bid</button>
             </td>
         </tr>`);
-    }
+    }*/
 
 
     for (let i = 0; i < 70; i++) {
@@ -113,7 +104,7 @@ $(document).ready(function () {
         </table>`;
     }
 
-    var table = $('#trading_t').DataTable({
+    let table = $('#trading_t').DataTable({
         "scrollX": true,
         "scrollY": $(window).height() / 2,
     });
@@ -150,7 +141,7 @@ $(document).ready(function () {
         </tr>`);
     }
 
-    $('table.display').DataTable({
+    $('#portfolio_t').DataTable({
         "scrollY": $(window).height() / 2,
         "scrollX": true
     });

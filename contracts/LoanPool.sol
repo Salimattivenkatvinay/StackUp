@@ -11,10 +11,10 @@ contract LoanPool {
     uint256 public maxParticipants;
     uint256 public collateralAmount;
     uint256 public poolStartTimestamp;
-    uint256 public totalParticipants;
-    uint256 public auctionInterval;
-    uint256 public auctionDuration;
-    uint256 internal loanerCount;
+    uint256 public totalParticipants; // total participants.
+    uint256 public auctionInterval; // gap bw wach auction. 1 month
+    uint256 public auctionDuration; // how much time aution should happen : 1hr
+    uint256 internal loanerCount; //
     uint256 internal claimerCount;
 
     mapping(address => bool) public isParticipant;
@@ -78,13 +78,15 @@ contract LoanPool {
             token.transferFrom(
                 msg.sender,
                 address(this),
-                minAmount ** token.decimals()
+                minAmount
             ),
             "ERC20: transferFrom failed !!"
         );
 
         isParticipant[msg.sender] = true;
         totalParticipants++;
+        if(totalParticipants >= maxParticipants)
+            poolStartTimestamp = block.timestamp;
         emit NewParticipant(address(this), msg.sender);
     }
 
@@ -274,7 +276,8 @@ contract LoanPool {
         ? totalParticipants - 1
         : totalParticipants
         ) *
-        auctionInterval);
+        auctionInterval *
+        1 hours);
     }
 
     function withdraw(uint256 amount) private returns (bool){
@@ -293,7 +296,7 @@ contract LoanPool {
     }
 
     function getPoolBalance() public view returns (uint256){
-        return address(this).balance;
+        return token.balanceOf(address(this));
     }
 
 }
