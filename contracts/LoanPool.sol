@@ -300,4 +300,9 @@ contract LoanPool {
         return token.balanceOf(address(this));
     }
 
+
+    function getSubAmount() public view returns (uint256){
+        uint minAmount = (collateralAmount / maxParticipants / 50) * 10 ** token.decimals();
+        return minAmount;
+    }
 }
