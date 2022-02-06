@@ -9,13 +9,21 @@ contract LoanPool {
 
     IERC20 public token;
     uint256 public maxParticipants;
-    uint256 public collateralAmount;
+    uint256 public collateralAmount; // 1,20,000
+    uint256 public installmentAmount; // 10,000
     uint256 public poolStartTimestamp;
     uint256 public totalParticipants; // total participants.
     uint256 public auctionInterval; // gap bw wach auction. 1 month
     uint256 public auctionDuration; // how much time aution should happen : 1hr
     uint256 internal loanerCount; //
     uint256 internal claimerCount;
+    //
+    //    struct installment{
+    //        uint term;
+    //        uint256 termAmount;
+    //    }
+
+    mapping(address => uint) userTermCount;
 
     mapping(address => bool) public isParticipant;
     mapping(uint256 => address) public highestBidder;
@@ -24,30 +32,22 @@ contract LoanPool {
     mapping(address => uint256) public loanAmount;
     mapping(address => bool) public claimedFinalYield;
 
-    mapping(address => bool) public isCollateralDeposited;
+    mapping(address => uint256) public collateralDeposited;
 
-    event NewParticipant(address loanPool, address participant);
-    event NewBidder(
-        address loanPool,
-        address bidder,
-        uint256 amount,
+    enum TransactionType{subscribe, bid, installment, collateral, jackpot, position}
+
+    event PoolTransactions(
+        address chitId,
+        address userId,
+        string transactionType,
+        string status,
+        string ttype,
         uint256 term,
-        uint256 timestamp
-    );
-    event ClaimedLoan(
-        address loanPool,
-        address claimer,
-        uint256 amount,
-        uint256 term
-    );
-    event ClaimedFinalYield(
-        address loanPool,
-        address participant,
         uint256 amount
     );
 
     constructor(
-        uint256 _maximumBidAmount, // 1,00,000 every month
+        uint256 _installmentAmount, // 1,00,000 every month per user
         uint256 _auctionInterval,
         uint256 _auctionDuration,
         uint256 _maxParticipants,
@@ -57,13 +57,13 @@ contract LoanPool {
         maxParticipants = _maxParticipants;
         auctionInterval = _auctionInterval;
         auctionDuration = _auctionDuration;
-
-        collateralAmount = _maximumBidAmount * _maxParticipants;
+        installmentAmount = _installmentAmount;
+        collateralAmount = (_installmentAmount * _maxParticipants);
+        //        collateralAmount = (12 * _installmentAmount * _maxParticipants) / 10;
         poolStartTimestamp = block.timestamp;
     }
 
-
-    function addInterest() public {
+    function subscribe() public {
         require(
             totalParticipants + 1 <= maxParticipants,
             "Exceeds maximum number of participants !!"
@@ -73,6 +73,7 @@ contract LoanPool {
             "You have already participated in the pool !!"
         );
         uint minAmount = (collateralAmount / maxParticipants / 50) * 10 ** token.decimals();
+        // 2% of  collateral amount
 
         require(
             token.transferFrom(
@@ -85,20 +86,46 @@ contract LoanPool {
 
         isParticipant[msg.sender] = true;
         totalParticipants++;
-        if(totalParticipants >= maxParticipants)
+        if (totalParticipants >= maxParticipants)
             poolStartTimestamp = block.timestamp;
-        emit NewParticipant(address(this), msg.sender);
+        emit PoolTransactions(address(this), msg.sender, "subscribe", "success", "debit", 0, minAmount);
+    }
+
+
+    function addInstallment() public {
+        require(
+            isParticipant[msg.sender],
+            "not in pool!!"
+        );
+
+        require(userTermCount[msg.sender] < getAuctionCount(), "already installment paid");
+
+        uint256 termInstallmentAmount = ((installmentAmount - highestBidAmount / maxParticipants) * 10 ** token.decimals());
+
+        require(
+            token.transferFrom(
+                msg.sender,
+                address(this),
+                termInstallmentAmount
+            ),
+            "ERC20: transferFrom failed !!"
+        );
+
+        userTermCount[msg.sender] = getAuctionCount();
+        emit PoolTransactions(address(this), msg.sender, "installment", "success", "debit", 0, termInstallmentAmount);
     }
 
     function depositCollateral() public {
-        require(!isCollateralDeposited[msg.sender], "already done bro");
-
-        uint256 term = ((block.timestamp - poolStartTimestamp) / ((auctionInterval - auctionDuration))) + 1;
+        require(collateralDeposited[msg.sender] == 0, "already done bro");
+        require(isParticipant[msg.sender], "not a participant");
+        uint256 term = getAuctionCount();
+        uint256 collateralDeposit = (collateralAmount - (term / totalParticipants) * collateralAmount);
         require(
-            deposit((collateralAmount - (term / totalParticipants) * collateralAmount) * 10 ** token.decimals()), //required collateral decreases
+            deposit(collateralDeposit * 10 ** token.decimals()), //required collateral decreases
             "Depositing on lending pool failed !!"
         );
-        isCollateralDeposited[msg.sender] = true;
+        collateralDeposited[msg.sender] = collateralDeposit;
+        emit PoolTransactions(address(this), msg.sender, "collateral", "success", "debit", getAuctionCount(), collateralDeposit);
     }
 
     function bid(uint256 bidAmount) public {
@@ -116,6 +143,7 @@ contract LoanPool {
             "You are not a participant of this pool"
         );
         require(!takenLoan[msg.sender], "You have already taken a loan !!");
+        // he already took a big in some month before
 
         require(bidAmount > highestBidAmount[getAuctionCount()],
             "Bid Amount must be greater than current bid amount and min bid amount !!"
@@ -126,13 +154,7 @@ contract LoanPool {
 
         loanAmount[msg.sender] = collateralAmount - bidAmount;
 
-        emit NewBidder(
-            address(this),
-            msg.sender,
-            bidAmount,
-            getAuctionCount(),
-            block.timestamp
-        );
+        emit PoolTransactions(address(this), msg.sender, "bid", "success", "debit", getAuctionCount(), bidAmount);
     }
 
     function claimLoan() public {
@@ -140,19 +162,19 @@ contract LoanPool {
 
         require(isWinner, "You are not the highest bidder !!");
 
-        if (term < totalParticipants - 1) {
-            require(
-                term < getAuctionCount(),
-                "Can't claim loan during the auction !!"
-            );
-        } else if (term >= totalParticipants) {
-            require(
-                block.timestamp > nextAutionCloseTimestamp(),
-                "Can't claim loan during the auction !!"
-            );
-        }
+        //        if (term < totalParticipants - 1) {
+        //            require(
+        //                term < getAuctionCount(),
+        //                "Can't claim loan during the auction !!"
+        //            );
+        //        } else if (term >= totalParticipants) {
+        require(
+            block.timestamp > nextAutionCloseTimestamp(),
+            "Can't claim loan during the auction !!"
+        );
+        //        }
 
-        require(isCollateralDeposited[msg.sender], "deposit collateral man!!");
+        require(collateralDeposited[msg.sender] > 0, "deposit collateral man!!");
 
         require(
             withdraw(loanAmount[msg.sender] * 10 ** token.decimals()),
@@ -161,18 +183,7 @@ contract LoanPool {
 
         takenLoan[msg.sender] = true;
         loanerCount++;
-
-        token.transfer(
-            msg.sender,
-            loanAmount[msg.sender] * 10 ** token.decimals()
-        );
-
-        emit ClaimedLoan(
-            address(this),
-            msg.sender,
-            loanAmount[msg.sender],
-            getAuctionCount() - 1
-        );
+        emit PoolTransactions(address(this), msg.sender, jackpot, "success", "credit", getAuctionCount(), loanAmount[msg.sender]);
     }
 
     function claimFinalYield() public {
@@ -199,23 +210,13 @@ contract LoanPool {
             "WithDrawl from lending pool failed !!"
         );
 
-        token.transfer(msg.sender, returnAmount);
-
-        emit ClaimedFinalYield(address(this), msg.sender, returnAmount);
+        emit PoolTransactions(address(this), msg.sender, collateral, "success", "credit", getAuctionCount(), returnAmount);
     }
 
     function finalReturnAmount() internal view returns (uint256) {
-        return
-        ((getPoolBalance() -
-        ((totalParticipants - loanerCount - claimerCount) *
-        collateralAmount *
-        10 ** token.decimals())) /
-        (totalParticipants - claimerCount)) +
-        (
-        takenLoan[msg.sender]
-        ? 0
-        : collateralAmount * 10 ** token.decimals()
-        );
+        uint minAmount = (collateralAmount / maxParticipants / 50) * 10 ** token.decimals();
+        return collateralDeposited[msg.sender] + minAmount;
+        // + some yeild. need to think about this.
     }
 
     function checkWinnerStatus(address account)
@@ -237,7 +238,7 @@ contract LoanPool {
     }
 
     function getAuctionCount() public view returns (uint256) {
-        uint256 term = ((block.timestamp - poolStartTimestamp) / ((auctionInterval - auctionDuration))) + 1;
+        uint256 term = ((block.timestamp - poolStartTimestamp) / ((auctionInterval))) + 1;
 
         if (term >= totalParticipants) {
             term = totalParticipants - 1;

@@ -53,16 +53,16 @@ async function showChits() {
     const query = new Moralis.Query(Chits);
     // query.equalTo("Status", "Open");
     const results = await query.find();
-// alert("Successfully retrieved " + results.length + " chits.");
-// Do something with the returned Moralis.Object values
     if (results.length==0){
         console.log("No Chits Open, Please create one... ")
     }
+    let chitsList = [];
     for (let i = 0; i < results.length; i++) {
         const object = results[i];
-//   alert(object.id + ' - ' + object);
         console.log(object);
+        chitsList[i] = object.attributes
     }
+    populateActiveChitsTable()
 }
 
 
@@ -125,3 +125,8 @@ async function myPortfolio() {
 // document.getElementById("btn-create-chit").onclick = createChit;
 // document.getElementById("btn-show-chits").onclick = showChits;
 // document.getElementById("btn-my-portfolio").onclick = myPortfolio;
+
+
+function populateActiveChitsTable(chits){
+
+}
