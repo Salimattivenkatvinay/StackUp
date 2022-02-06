@@ -43,7 +43,7 @@ contract StackUpFactory is Owner {
         emit NewLoanPool(
             totalPools,
             loanPool,
-            bidAmount,
+            installmentAmount,
             auctionInterval,
             maxParticipants,
             token,

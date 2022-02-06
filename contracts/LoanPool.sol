@@ -52,7 +52,7 @@ contract LoanPool {
         uint256 _auctionDuration,
         uint256 _maxParticipants,
         address _token
-    ) public {
+    ) {
         token = IERC20(_token);
         maxParticipants = _maxParticipants;
         auctionInterval = _auctionInterval;
@@ -100,7 +100,7 @@ contract LoanPool {
 
         require(userTermCount[msg.sender] < getAuctionCount(), "already installment paid");
 
-        uint256 termInstallmentAmount = ((installmentAmount - highestBidAmount / maxParticipants) * 10 ** token.decimals());
+        uint256 termInstallmentAmount = ((installmentAmount - highestBidAmount[getAuctionCount()] / maxParticipants) * 10 ** token.decimals());
 
         require(
             token.transferFrom(
@@ -112,7 +112,7 @@ contract LoanPool {
         );
 
         userTermCount[msg.sender] = getAuctionCount();
-        emit PoolTransactions(address(this), msg.sender, "installment", "success", "debit", 0, termInstallmentAmount);
+        emit PoolTransactions(address(this), msg.sender, "installment", "success", "debit", getAuctionCount(), termInstallmentAmount);
     }
 
     function depositCollateral() public {
@@ -183,7 +183,7 @@ contract LoanPool {
 
         takenLoan[msg.sender] = true;
         loanerCount++;
-        emit PoolTransactions(address(this), msg.sender, jackpot, "success", "credit", getAuctionCount(), loanAmount[msg.sender]);
+        emit PoolTransactions(address(this), msg.sender, "jackpot", "success", "credit", getAuctionCount(), loanAmount[msg.sender]);
     }
 
     function claimFinalYield() public {
@@ -210,7 +210,7 @@ contract LoanPool {
             "WithDrawl from lending pool failed !!"
         );
 
-        emit PoolTransactions(address(this), msg.sender, collateral, "success", "credit", getAuctionCount(), returnAmount);
+        emit PoolTransactions(address(this), msg.sender, "collateral", "success", "credit", getAuctionCount(), returnAmount);
     }
 
     function finalReturnAmount() internal view returns (uint256) {
