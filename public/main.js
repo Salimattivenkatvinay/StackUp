@@ -117,7 +117,7 @@ async function subscribeChit() {
 
                 chit.increment("Members");
                 chit.save();
-                alert("Ohoo, you have been subscribed successfully")
+                alert(".5% of the chit value will be deducted as subscription amount")
             }
         }, (error) => {
             // The object was not retrieved successfully.
@@ -171,6 +171,25 @@ async function bidChit(bidAmount) {
         orders.set("UserId", user.get("ethAddress"));
         orders.set("Term", term);
         orders.save();
+
+
+        $("#bidding_table").append(`
+          <tr>
+                            <td>
+                            4
+                            </td>
+                            <td>
+                            0xdwfbgnhngbfvgdfcssfgbnhhb
+                            </td>
+                            <td>
+                            6500
+                            </td>
+                            <td>
+                            7:22:14 am
+                            </td>
+                        </tr>`);
+
+        document.getElementById('highest_bid').innerHTML = "Highest Bid: 6500"
     }
     ;
     (error) => {
@@ -485,7 +504,7 @@ function populatePortfolioChitsTable(chits) {
         }
         $("#portfolio_table").append(`
         <tr>
-           <td>${chitData["ChitId"]}</td>
+           <td>Ox1..</td>
           <td>${parseInt(chitData["Installment"]) * parseInt(chitData["Members"])}</td>
           <td>${parseInt(chitData["ChitPeriod"]).toString() + 'months'}</td>
           <td>${chitData["Installment"]}</td>
@@ -527,7 +546,7 @@ function populatePortfolioDetBid(chitId) {
             <div class="row">
             <div class="col-12">
                  <button class="btn btn-danger offset-11" onclick="$('#portfolio_t_det').hide()"> close </button>
-                <h4 class="mt-3"> Highest Bid: 2500</h4>
+                <h4 id="highest_bid" class="mt-3"> Highest Bid: 6300</h4>
                 <h3 id="bid_timer" class="mt-3"> Remaining time : </h3>
             </div>
             <div class="col-12">
@@ -538,41 +557,41 @@ function populatePortfolioDetBid(chitId) {
                             1
                             </td>
                             <td>
-                            0xdwfegrhtjykuwfegbh
+                            0xdwfegrhtjykuwfegbhvbdfnmynebhwgf
                             </td>
                             <td>
-                            $890
+                            5000
                             </td>
                             <td>
-                            12:01:01 pm
-                            </td>
-                        </tr>
-                         <tr>
-                            <td>
-                            1
-                            </td>
-                            <td>
-                            0xdwfegrhtjykuwfegbh
-                            </td>
-                            <td>
-                            $890
-                            </td>
-                            <td>
-                            12:01:01 pm
+                            7:20:01 am
                             </td>
                         </tr>
                          <tr>
                             <td>
-                            1
+                            2
                             </td>
                             <td>
-                            0xdwfegrhtjykuwfegbh
+                            0xdwegrhetjrsyjnhtgrefwegrhttjym
                             </td>
                             <td>
-                            $890
+                            6000
                             </td>
                             <td>
-                            12:01:01 pm
+                            7:20:33 am
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>
+                            3
+                            </td>
+                            <td>
+                            0xdwffegvbhtnjnhbgrfedwfghnjhgfgv
+                            </td>
+                            <td>
+                            6300
+                            </td>
+                            <td>
+                            7:21:57 am
                             </td>
                         </tr>
                         </tbody>
@@ -603,6 +622,7 @@ function populatePortfolioDetBid(chitId) {
             $("#bid_input").hide();
             $("#bid_timer").hide();
             // timer = duration;
+            alert("Yay!! you have won the bid")
         }
     }, 1000);
 }
