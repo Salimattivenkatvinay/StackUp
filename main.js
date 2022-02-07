@@ -290,7 +290,7 @@ async function depositCollateral() {
                 const object = results[i];
             }
             console.log(results);
-            const collateralAmount = 12 * chit.get("ChitValue") / 10;
+            const collateralAmount = 12 * chit.get("ChitValue") / 100;
             console.log(collateralAmount);
             const contract_address = "0xf25539868efc4ea57e33e917a4b0EF4f89267a83"
             const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
