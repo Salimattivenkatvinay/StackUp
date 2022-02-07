@@ -3,6 +3,7 @@
 pragma solidity ^0.8.7;
 
 import "./IERC20.sol";
+import "./Positions.sol";
 
 
 contract LoanPool {
@@ -298,6 +299,29 @@ contract LoanPool {
 
     function getPoolBalance() public view returns (uint256){
         return token.balanceOf(address(this));
+    }
+
+    function getIsparticipant(address paricipant) public view returns(bool){
+        return isParticipant[paricipant];
+    }
+    function getClaimstatus(address paricipant) public view returns(bool){
+        return claimedFinalYield[paricipant];
+    }
+    function setIsparticipant(address paricipant,bool status) private {
+        isParticipant[paricipant]=status;
+    }
+
+    function swapPosition(address positionAddress) public returns(bool) {
+        Position PositionContract =Position(positionAddress);
+        require(!getIsparticipant(msg.sender),"you cannot swap this position as you are already part of this pool");
+        require(PositionContract.compareStrings(PositionContract.getpositionstatus(),'Active'),"you cannot swap this position as this is inactive position");
+        // uint256 collateralAmounttobepaid=PositionContract.getcollateralamount;
+        // deposit(PositionContract.getcollateralamount());
+        bool returnToposition= token.transferFrom(msg.sender,PositionContract.getpositionParticipant(),PositionContract.getReservePrice());
+        // withdraw(PositionContract.getpositionParticipant(),PositionContract.getcollateralamount());
+        setIsparticipant(PositionContract.getpositionParticipant(),false);
+        setIsparticipant(msg.sender,true);
+        return returnToposition;
     }
 
 }

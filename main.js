@@ -124,7 +124,7 @@ async function subscribeChit() {
                 orders.save();
 
                 chit.increment("Members");
-                if (chit.get("MaxMembers")==chit.get("Members")){
+                if (chit.get("MaxMembers") == chit.get("Members")) {
                     orders.set("Status", "Close");
                 }
                 chit.save();
@@ -254,7 +254,7 @@ async function myPortfolio() {
         return userChitStatusMap.hasOwnProperty(chit['ChitId'])
     })
 
-    populatePortfolioChitsTable(usersChitList)
+    populatePortfolioChitsTable(chitsList)
 }
 
 
@@ -314,14 +314,15 @@ async function depositCollateral() {
 
 async function addPosition() {
 
+    $("#positionInput").hide();
+
     let user = Moralis.User.current();
     if (!user) {
         login()
     }
-    ;
     console.log("User", user);
 
-    chitId = document.getElementById("chitId").value
+    // chitId = document.getElementById("chitId").value
     const Chits = Moralis.Object.extend("Chits");
     const query = new Moralis.Query(Chits);
     //get monster with id xWMyZ4YEGZ
@@ -332,21 +333,21 @@ async function addPosition() {
             term = monthDiff(chit.createdAt, new Date());
 
             const Positions = Moralis.Object.extend("Positions");
-            console.log(results);
+            // console.log(results);
 
             const positionAmount = document.getElementById("positionAmount").value
             console.log(positionAmount);
-            if (result) {
+            // if (result) {
                 const orders = new Positions();
                 orders.set("ChitId", chitId);
-                orders.set("PositionId", new Date());
+                orders.set("PositionId", Date.now());
                 orders.set("Type", "Position");
                 orders.set("Amount", positionAmount);
                 orders.set("Status", "Open");
                 orders.set("UserId", user.get("ethAddress"));
                 orders.set("Term", term);
                 orders.save();
-            }
+            // }
         }, (error) => {
             // The object was not retrieved successfully.
             // error is a Moralis.Error with an error code and message.
@@ -380,43 +381,48 @@ async function showPositions() {
         console.log("Positions", positionsList[i]);
     }
     populatePositionsTable(positionsList)
-
-    myPortfolio()
 }
 
 
-async function buyPosition(positionId) {
+async function buyPosition(positionId, positionAmount, to_address) {
+
+    console.log("positionId: " + positionId)
+    console.log("to_address: " + to_address)
 
     let user = Moralis.User.current();
     if (!user) {
         login()
-    };
+    }
+    ;
     console.log("User", user);
-
+    //
     const Positions = Moralis.Object.extend("Positions");
-    const query = new Moralis.Query(Positions);
-    query.equalTo("PositionId", positionId);
-    query.equalTo("Type", "Position");
-    const results = query.first();
-    console.log("Positions:", results);
+    // const query = new Moralis.Query(Positions);
+    // query.equalTo("PositionId", positionId);
+    // query.equalTo("Type", "Position");
+    // const results = await query.find();
+    // console.log("Positions:", results);
 
-    const positionAmount = document.getElementById("fregt").value
-    // console.log(positionAmount);
+    // const positionAmount = results[0]['Amount']
+    console.log("positionAmount: " + positionAmount);
     const contract_address = "0x3B74cEc6d144958766b9FE7075FD37296d343095"
-    const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
+    // const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
+    // const to_address = results['PositionOwner'];
     result = addMoney(to_address, positionAmount, contract_address);
 
     if (result) {
         const orders = new Positions();
-        orders.set("ChitId", positionId);
+        orders.set("positionId", positionId);
+        orders.set("chitId", chitId);
         orders.set("Type", "PositionBuy");
         orders.set("Amount", positionAmount);
         orders.set("UserId", user.get("ethAddress"));
         orders.save();
-        }(error) => {
-            // The object was not retrieved successfully.
-            // error is a Moralis.Error with an error code and message.
-        };
+    }
+    (error) => {
+        // The object was not retrieved successfully.
+        // error is a Moralis.Error with an error code and message.
+    };
 }
 
 
@@ -542,18 +548,18 @@ async function addMoney(to_address, amount, token_address) {
 
     console.log("Called AddMoney");
     // sending 0.5 tokens with 18 decimals
-    amount=100;
-    contractAddress = "0x3B74cEc6d144958766b9FE7075FD37296d343095";
-    receiver= "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
-    if (token_address){
-        contractAddress = token_address
-    }
+    // amount = 100;
+    // contractAddress = "0x3B74cEc6d144958766b9FE7075FD37296d343095";
+    // receiver = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
+    // if (token_address) {
+    //     contractAddress = token_address
+    // }
     const options = {
         type: "erc20",
         amount: Moralis.Units.Token(amount.toString(), "18"),
-        contractAddress: contractAddress,
+        contractAddress: token_address,
         receiver: to_address,
-        }
+    }
     let result = await Moralis.transfer(options)
 }
 
@@ -615,15 +621,16 @@ function populatePositionsTable(positions) {
 
         let positionsData = positions[i];
         PositionId = positionsData["PositionId"];
+        PositionAmount = positionsData["Amount"];
+        to_address = positionsData["PositionOwner"];
         $("#trading_table").append(`
       <tr id="fregt">
-          <td>${positionsData["ChitId"]}</td>
           <td>${PositionId}</td>
+          <td>${positionsData["ChitId"]}</td>
           <td>${parseInt(positionsData["Amount"]).toString()}</td>
-          <td>${positionsData["UserId"]}</td>
-          <td>${positionsData["Status"]}</td>
+          <td>${positionsData["PositionOwner"]}</td>
           <td>
-              <button type="button" class="btn btn-primary" onclick="buyPosition()">Buy Position</button>
+              <button type="button" class="btn btn-primary" onclick="buyPosition(PositionId, PositionAmount, to_address)">Buy Position</button>
           </td>
       </tr>`);
     }
@@ -659,12 +666,15 @@ function populatePortfolioChitsTable(chits) {
         $("#portfolio_table").append(`
         <tr>
            <td>Ox1..</td>
-          <td>${parseInt(chitData["Installment"]) * parseInt(chitData["Members"])}</td>
+          <td>${parseInt(chitData["ChitValue"])}</td>
           <td>${parseInt(chitData["ChitPeriod"]).toString() + 'months'}</td>
           <td>${chitData["Installment"]}</td>
           <td>${parseInt(chitData["Members"])}</td>
             <td>
                 <button type="button" class="btn btn-primary" onclick=chitUserAction(chitId)>${btntext}</button>
+            </td> 
+               <td>
+                <button type="button" class="btn btn-primary" onclick=sellPosition(chitId)>Sell Position</button>
             </td>
         </tr>`);
     }
@@ -692,6 +702,21 @@ function chitUserAction(chitId) {
     }
 }
 
+
+function sellPosition(chitId) {
+
+    $('#portfolio_t_det').empty()
+        .show().append(
+        `
+            <div class="row">
+            <div id="positionInput" class="col-12">
+                <input type="number" id="positionAmount"> 
+                <button class="btn btn-dark" onclick=addPosition()> Place</button>
+            </div>
+            </div>
+            `);
+
+}
 
 function populatePortfolioDetBid(chitId) {
     $('#portfolio_t_det').empty()
