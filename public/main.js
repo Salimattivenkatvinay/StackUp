@@ -1,13 +1,13 @@
 /* Moralis init code */
 const serverUrl = "https://dwxhhoss5qvz.usemoralis.com:2053/server";
 const appId = "7OorB7zJoEKWq8IOIYJJEcr6ESEP44aXhYNJcvgJ";
-Moralis.start({ serverUrl, appId });
+Moralis.start({serverUrl, appId});
 
 /* Authentication code */
 async function login() {
     let user = Moralis.User.current();
     if (!user) {
-        user = await Moralis.authenticate({ signingMessage: "Log in using Moralis" })
+        user = await Moralis.authenticate({signingMessage: "Log in using Moralis"})
             .then(function (user) {
                 console.log("logged in user:", user);
                 console.log(user.get("ethAddress"));
@@ -28,6 +28,7 @@ async function createChit() {
     const Chits = Moralis.Object.extend("Chits");
     const chits = new Chits();
 
+    chits.set("ChitId", 0);
     chits.set("ChitValue", 100000);
     chits.set("ChitPeriod", 10);
     chits.set("Members", 10);
@@ -46,6 +47,7 @@ async function createChit() {
         });
 }
 
+var chitsList = [];
 
 async function showChits() {
 
@@ -55,14 +57,27 @@ async function showChits() {
     const results = await query.find();
 // alert("Successfully retrieved " + results.length + " chits.");
 // Do something with the returned Moralis.Object values
-    if (results.length==0){
+    if (results.length == 0) {
         console.log("No Chits Open, Please create one... ")
     }
     for (let i = 0; i < results.length; i++) {
         const object = results[i];
-//   alert(object.id + ' - ' + object);
         console.log(object);
+        // object.attributes["ChitId"] = object.id
+        let dat = {}
+        dat['ChitId'] = object.id
+        dat['ChitValue'] = object.attributes['ChitValue']
+        dat['ChitPeriod'] = object.attributes['ChitPeriod']
+        dat['Members'] = object.attributes['Members']
+        dat['Installment'] = object.attributes['Installment']
+        dat['Type'] = object.attributes['Type']
+        dat['Status'] = object.attributes['Status']
+        chitsList[i] = dat
+        console.log(chitsList[i]);
     }
+    populateActiveChitsTable(chitsList)
+
+    myPortfolio()
 }
 
 $(document).ready(function () {
@@ -72,10 +87,13 @@ $(document).ready(function () {
 async function subscribeChit() {
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
-    chitId = document.getElementById("chitId").value
+    // = document.getElementById("chitId").value
     const Chits = Moralis.Object.extend("Chits");
     const query = new Moralis.Query(Chits);
     //get monster with id xWMyZ4YEGZ
@@ -85,11 +103,11 @@ async function subscribeChit() {
             console.log(chit);
             const ChitTransactions = Moralis.Object.extend("ChitTransations");
             const orders = new ChitTransactions();
-            const subscribeAmount = 5*chit.get("ChitValue")/100;
+            const subscribeAmount = 5 * chit.get("ChitValue") / 1000;
             console.log(subscribeAmount);
             const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
             result = addMoney(to_address, subscribeAmount);
-            if (result){
+            if (result) {
                 orders.set("ChitId", chitId);
                 orders.set("Type", "Subscribe");
                 orders.set("Amount", subscribeAmount);
@@ -99,6 +117,7 @@ async function subscribeChit() {
 
                 chit.increment("Members");
                 chit.save();
+                alert("Ohoo, you have been subscribed successfully")
             }
         }, (error) => {
             // The object was not retrieved successfully.
@@ -109,10 +128,13 @@ async function subscribeChit() {
 async function bidChit(bidAmount) {
 
     bidAmount = document.getElementById("bidAmount").value;
-    chitId = document.getElementById("chitId").value
+    // chitId = document.getElementById("chitId").value
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
     const Chits = Moralis.Object.extend("Chits");
@@ -133,13 +155,14 @@ async function bidChit(bidAmount) {
     let bids = [];
     for (let i = 0; i < chit_orders.length; i++) {
         const object = chit_orders[i];
-        if (object.type =='bid'){
+        if (object.type == 'bid') {
             //   alert(object.id + ' - ' + object);
             console.log(object);
             bids.push(object.amount);
             console.log(bids);
-        }}
-    if (bidAmount > Math.max(bids)){
+        }
+    }
+    if (bidAmount > Math.max(bids)) {
         const orders = new ChitTransactions();
         orders.set("ChitId", chitId);
         orders.set("Type", "Bid");
@@ -148,27 +171,34 @@ async function bidChit(bidAmount) {
         orders.set("UserId", user.get("ethAddress"));
         orders.set("Term", term);
         orders.save();
-    };
+    }
+    ;
     (error) => {
         // The object was not retrieved successfully.
         // error is a Moralis.Error with an error code and message.
     };
 }
 
+var userChitStatusMap = {}
 
 async function myPortfolio() {
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
     const ChitTransactions = Moralis.Object.extend("ChitTransations");
     const query = new Moralis.Query(ChitTransactions);
     query.equalTo("UserId", user.get("ethAddress"));
+    query.descending("createdAt");
     const results = await query.find();
+
     // alert("Successfully retrieved " + results.length + " chits.");
     // Do something with the returned Moralis.Object values
-    if (results.length==0){
+    if (results.length == 0) {
         console.log("No Chits, Please subscribe to one... ")
     }
     // for (let i = 0; i < results.length; i++) {
@@ -176,18 +206,38 @@ async function myPortfolio() {
     // //   alert(object.id + ' - ' + object);
     // console.log(object.attributes);
     // }
-    console.log(results);
+    console.log("myPortfolio: ")
+    console.log(results)
 
+    for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+        console.log(object);
+        let dat = object.attributes
+        if (userChitStatusMap.hasOwnProperty(dat['ChitId'])) {
+
+        } else {
+            userChitStatusMap[dat['ChitId']] = dat['Type']
+        }
+    }
+
+    let usersChitList = chitsList.filter(function (chit) {
+        return userChitStatusMap.hasOwnProperty(chit['ChitId'])
+    })
+
+    populatePortfolioChitsTable(usersChitList)
 }
 
 
 async function depositCollateral() {
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
-    chitId = document.getElementById("chitId").value
+    // chitId = document.getElementById("chitId").value
     const Chits = Moralis.Object.extend("Chits");
     const query = new Moralis.Query(Chits);
     //get monster with id xWMyZ4YEGZ
@@ -203,18 +253,19 @@ async function depositCollateral() {
             const results = query.find();
             // alert("Successfully retrieved " + results.length + " chits.");
             // Do something with the returned Moralis.Object values
-            if (results.length==0){
+            if (results.length == 0) {
                 console.log("No Chits, Please subscribe to one... ")
             }
             for (let i = 0; i < results.length; i++) {
                 const object = results[i];
             }
             console.log(results);
-            const collateralAmount = 12*chit.get("ChitValue")/10;
+            const collateralAmount = 12 * chit.get("ChitValue") / 100;
             console.log(collateralAmount);
             const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
             result = addMoney(to_address, collateralAmount);
-            if (result){
+            if (result) {
+                const orders = new ChitTransactions();
                 orders.set("ChitId", chitId);
                 orders.set("Type", "Collateral");
                 orders.set("Amount", collateralAmount);
@@ -240,7 +291,10 @@ function monthDiff(d1, d2) {
 async function addInstallment() {
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
     chitId = document.getElementById("chitId").value
@@ -259,7 +313,7 @@ async function addInstallment() {
             const results = query.find();
             // alert("Successfully retrieved " + results.length + " chits.");
             // Do something with the returned Moralis.Object values
-            if (results.length==0){
+            if (results.length == 0) {
                 console.log("No Chits, Please subscribe to one... ")
             }
             for (let i = 0; i < results.length; i++) {
@@ -270,7 +324,7 @@ async function addInstallment() {
             console.log(installmentAmount);
             const to_address = "0xdd59a4141cea60f2bf400308896c61c48e9c41e0";
             result = addMoney(to_address, installmentAmount);
-            if (result){
+            if (result) {
                 orders.set("ChitId", chitId);
                 orders.set("Type", "Installment");
                 orders.set("Amount", installmentAmount);
@@ -288,7 +342,10 @@ async function addInstallment() {
 async function getJackPot() {
 
     let user = Moralis.User.current();
-    if (!user) { login()};
+    if (!user) {
+        login()
+    }
+    ;
     console.log("User", user);
 
     chitId = document.getElementById("chitId").value
@@ -339,6 +396,7 @@ async function sendMoney() {
 }
 
 Moralis.enableWeb3()
+
 async function addMoney(to_address, amount) {
 
     // sending 0.5 tokens with 18 decimals
@@ -356,28 +414,31 @@ document.getElementById("btn-login").onclick = login;
 document.getElementById("btn-logout").onclick = logOut;
 document.getElementById("btn-create-chit").onclick = createChit;
 document.getElementById("btn-bid-chit").onclick = bidChit;
-document.getElementById("btn-show-chits").onclick = showChits;
+// document.getElementById("btn-show-chits").onclick = showChits;
 document.getElementById("btn-my-portfolio").onclick = myPortfolio;
 document.getElementById("btn-add-installment").onclick = addInstallment;
 document.getElementById("btn-get-jackpot").onclick = getJackPot;
 
+var chitId = ""
 
 function populateActiveChitsTable(chits) {
 
     console.table(chits);
 
     for (let i = 0; i < chits.length; i++) {
+
         let chitData = chits[i];
+        chitId = chitData["ChitId"];
         $("#active_table").append(`
       <tr id="fregt">
-          <td>${chitData["loanPool"]}</td>
-          <td>${parseInt(chitData["installmentAmount"]) * parseInt(chitData["maxParticipants"])}</td>
-          <td>${(parseInt(chitData["maxParticipants"]) * parseInt(chitData["auctionInterval"]).toString() + 's')}</td>
-          <td>${chitData["installmentAmount"]}</td>
-          <td>${parseInt(chitData["maxParticipants"])}</td>
-          <td>${chitData["status"]}</td>
+          <td>${chitData["ChitId"]}</td>
+          <td>${parseInt(chitData["Installment"]) * parseInt(chitData["Members"])}</td>
+          <td>${parseInt(chitData["ChitPeriod"]).toString() + 'months'}</td>
+          <td>${chitData["Installment"]}</td>
+          <td>${parseInt(chitData["Members"])}</td>
+          <td>${chitData["Status"]}</td>
           <td>
-              <button id=${i} type="button" class="btn btn-primary" onclick="placeBid(${chitData["loanPool"]})">Subscribe</button>
+              <button type="button" class="btn btn-primary" onclick="subscribeChit()">Subscribe</button>
           </td>
       </tr>`);
     }
@@ -393,4 +454,155 @@ function populateActiveChitsTable(chits) {
     //     <b> 5% of your installment will be deducted as subscription fee, which is completely refundable at the end.</b>`
     //     ))
     // });
+}
+
+
+function populatePortfolioChitsTable(chits) {
+
+    console.table(chits);
+    for (let i = 0; i < chits.length; i++) {
+        let chitData = chits[i];
+        chitId = chitData["ChitId"];
+
+        let btntext = "";
+        switch (userChitStatusMap[chitId]) {
+            case "Subscribe" :
+                btntext = "Bid";
+                break;
+            case "Bid" :
+                btntext = "Add collateral";
+                break;
+            case "Collateral" :
+                btntext = "Claim Jackpot"
+            case "JackPot" :
+                btntext = "Installment";
+                break;
+            case "Installment" :
+                btntext = "Bid";
+                break;
+            default :
+                btntext = "view chit"
+        }
+        $("#portfolio_table").append(`
+        <tr>
+           <td>${chitData["ChitId"]}</td>
+          <td>${parseInt(chitData["Installment"]) * parseInt(chitData["Members"])}</td>
+          <td>${parseInt(chitData["ChitPeriod"]).toString() + 'months'}</td>
+          <td>${chitData["Installment"]}</td>
+          <td>${parseInt(chitData["Members"])}</td>
+            <td>
+                <button type="button" class="btn btn-primary" onclick=chitUserAction(chitId)>${btntext}</button>
+            </td>
+        </tr>`);
+    }
+
+    $('#portfolio_t').DataTable({
+        "scrollY": $(window).height() / 2,
+        "scrollX": true
+    });
+}
+
+function chitUserAction(chitId) {
+
+    switch (userChitStatusMap[chitId]) {
+        case "Subscribe" :
+            populatePortfolioDetBid(chitId)
+            break;
+        case "Bid" :
+            depositCollateral()
+            break;
+        case "Deposit" :
+            break;
+        case "Installment" :
+            break;
+        default :
+    }
+}
+
+
+function populatePortfolioDetBid(chitId) {
+    $('#portfolio_t_det').empty()
+        .show().append(
+        `
+            <div class="row">
+            <div class="col-12">
+                 <button class="btn btn-danger offset-11" onclick="$('#portfolio_t_det').hide()"> close </button>
+                <h4 class="mt-3"> Highest Bid: 2500</h4>
+                <h3 id="bid_timer" class="mt-3"> Remaining time : </h3>
+            </div>
+            <div class="col-12">
+                <table class="table table-dark mt-5" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                       <tbody id="bidding_table" >
+                        <tr>
+                            <td>
+                            1
+                            </td>
+                            <td>
+                            0xdwfegrhtjykuwfegbh
+                            </td>
+                            <td>
+                            $890
+                            </td>
+                            <td>
+                            12:01:01 pm
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>
+                            1
+                            </td>
+                            <td>
+                            0xdwfegrhtjykuwfegbh
+                            </td>
+                            <td>
+                            $890
+                            </td>
+                            <td>
+                            12:01:01 pm
+                            </td>
+                        </tr>
+                         <tr>
+                            <td>
+                            1
+                            </td>
+                            <td>
+                            0xdwfegrhtjykuwfegbh
+                            </td>
+                            <td>
+                            $890
+                            </td>
+                            <td>
+                            12:01:01 pm
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+            </div>
+            
+            <div id="bid_input">
+            <input type="number" id="bidAmount"> <button class="btn btn-dark" onclick=bidChit()> Place</button>
+            </div>
+            </div>`
+    )
+
+    var fiveMinutes = 60 * .25;
+
+    var timer = fiveMinutes, minutes, seconds;
+    let tim = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        document.getElementById('bid_timer').innerHTML = "Remaining time:" + minutes + ":" + seconds
+
+        if (--timer < 0) {
+            console.log("stopped")
+            clearInterval(tim)
+            $("#bid_input").hide();
+            $("#bid_timer").hide();
+            // timer = duration;
+        }
+    }, 1000);
 }
