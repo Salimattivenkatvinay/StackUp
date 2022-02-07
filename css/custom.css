@@ -1,0 +1,595 @@
+@import url("https://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700");
+
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+.navbar.navbar-default {
+  background-color:#ffffff;
+  /*height:83px;*/
+}
+
+.navbar.navbar-default.hidden-xs {
+	background-color: #e8eff6;
+}
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+  background-color:transparent;
+  z-index:999;
+  position:relative;
+}
+
+.navbar-default .navbar-nav > li > a {
+  font-size:12px;
+  color:#3e4095;
+  font-weight:500;
+}
+
+@media (max-width:992px) {
+
+
+.navbar-collapse{
+z-index: 1 !important;
+position: relative !important;
+top:30px;
+border-bottom:2px solid #ddd;
+box-shadow:0px 0px 10px #ddd;
+
+
+
+}
+
+.active { margin-top:7px !important;
+    
+}
+
+.bg-white {
+    background:#fff !important;
+
+}
+
+
+}
+
+ul.nav-pills > li > a {
+    color: #111 !important;
+    border: 1px solid #097eb2 !important;
+    border-radius: 3px !important;
+    background: #e8eff630 !important;
+    font-family: 'Raleway', sans-serif;
+}
+
+
+.nav > li > a {
+    padding: 2px 10px !important;
+    font-family: 'Raleway', sans-serif;
+}
+
+.navbar-default .navbar-nav > li > a:hover {
+    background: rgba(65, 68, 180, 0.56) !important;
+    color: #fffabb;
+    border-radius: 4px;
+    font-family: 'Raleway', sans-serif;
+} 
+
+body {
+ font-family:'Rubik', sans-serif;
+  line-height:1.42857143;
+  color:#555555;
+}
+
+p, li, span, a {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400 !important;
+}
+
+.btn {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400 !important;
+    letter-spacing:0.01rem;
+    font-size:15px;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', sans-serif;
+}
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  color:#3e4095;
+  background-color:transparent;
+  font-weight:500;
+  font-size:13px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+.splash-bg{
+	background-color: #e8eff6 !important;
+	padding-top: 60px;
+}
+.main-nav{
+	height:83px !important;
+}
+.icon-chitsapp{
+  text-align:center;
+  margin:65px 0px;
+  color:#34005c;
+  font-weight:500;
+}
+.mrgnB20{
+	margin-bottom:20px;
+}
+.navbar-brand{
+	padding:5px 15px !important;
+}
+section.banner{
+	padding: 100px 0px;
+	text-align: center;
+	/* [disabled]background-color: #8f6b6b; */
+	color: #fff;
+	}
+section.dynamic-banner{
+	padding: 40px 0px;
+	text-align: center;
+	/* [disabled]background-color: #8f6b6b; */
+	color: #fff;
+	}
+section.dynamic-banner h1{
+    color:#fff;
+
+}
+
+.faq-banner{
+	background-image: url(../img/faq-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size:cover;
+}
+.howchitworks-banner{
+	background-image: url(../img/howchitworks-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.whykc-banner{
+	background-image: url(../img/whykc-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.chitplans-banner{
+	background-image: url(../img/chitplans-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.join-banner{
+	background-image: url(../img/join-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.signin-banner{
+	background-image: url(../img/signin-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.media-banner{
+	background-image: url(../img/media-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.legal-banner{
+	background-image: url(../img/legal-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.privacy-banner{
+	background-image: url(../img/privacy-banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+.banner h1 {
+  color:#fff;
+  font-weight:700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (min-width:992px) {
+  .hero .get-it {
+    text-align:right;
+    margin-top:80px;
+    padding-right:30px;
+  }
+}
+
+@media (max-width:992px) {
+  .hero .get-it {
+    text-align:center;
+  }
+
+    .pop-max-disc-sm{
+        float:left !important;
+        text-align:center;
+        width:100%;
+    }
+}
+
+@media (max-width:992px) {
+  .hero .phone-preview {
+    text-align:center;
+  }
+}
+@media (min-width:768px) and (max-width:991px){
+
+
+ .site-footer h5 {
+    text-align:left;
+  }
+  .site-footer .social-icons {
+    text-align:right;
+  }
+.navbar-right {
+    float:right !important;
+    margin-right:-15px;
+    /*font-size:10px;*/
+}
+ .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  color:#3e4095;
+  background-color:transparent;
+  font-weight:600;
+  font-size:11px;
+  letter-spacing:0px;
+  text-transform:uppercase;
+}
+.navbar-default .navbar-nav > li > a {
+  font-size:11px;
+  color:#3e4095;
+  font-weight:600;
+}
+.nav>li>a{
+	padding:15px 10px !important;
+}
+.splash-bg h1{
+	font-size:40px;
+	font-weight:200;
+	color:#000;
+	margin:10px 0px;
+	padding-left:40px;
+}
+.splash-bg h2{
+	font-size:40px;
+	font-weight:400;
+	color:#000;
+	margin:10px 0px;
+	padding-left:40px;
+}
+.splash-bg h3{
+	font-size:40px;
+	font-weight:600;
+	color:#000;
+	margin:10px 0px;
+	padding-left:40px;
+}
+.vc-container{
+    display: table !important;
+    width: 100% !important;
+    height: 220px !important;
+}
+.icon-chitsapp{
+  text-align:center;
+  margin:40px 0px;
+  color:#34005c;
+  font-weight:500;
+}
+section.stackupapp{
+	background-color: #fffabb;
+	padding: 60px 0px;
+}
+.howchitworks h1 {
+	font-size:30px;
+    margin: 0px 0px 40px 0px;
+}
+section.howchitworks {
+    padding: 50px 30px;
+    color: #000;
+}
+section.features2 {
+    background-color: #fff;
+    padding: 50px 0px;
+    color: #fff;
+}
+.team-boxed .item .box {
+    text-align: center;
+    padding: 30px;
+    background-color: #fff;
+    margin: 10px 10px 20px 10px !important;
+	height:390px !important;
+}
+section.whiterow {
+    padding: 50px 0px !important;
+}
+}
+@media (min-width:320px) and (max-width:767px){
+.splash-bg h1{
+	font-size:36px;
+	font-weight:200;
+	color:#a50e0b;
+	text-align:center;
+	margin:10px 0px;
+}
+.splash-bg h2{
+	font-size:36px;
+	font-weight:400;
+	color:#a50e0b;
+	text-align:center;
+	margin:10px 0px;
+}
+.splash-bg h3{
+	font-size:36px;
+	font-weight:600;
+	color:#a50e0b;
+	text-align:center;
+	margin:10px 0px;	
+}
+.vc-container {
+    display: table !important;
+    width: 100% !important;
+    height: 180px !important;
+}
+.splash-bg {
+    background-color: #e8eff6 !important;
+    padding-top: 30px;
+}
+.whiterow h1 {
+    color: #000000 !important;
+    text-align: center !important;
+    margin-right: auto;
+    margin-left: auto;
+	font-size:30px;
+	margin-top:0px !important;
+	margin-bottom: 30px !important;
+}
+section.whiterow {
+    padding: 50px 0px !important;
+}
+section.features {
+    background-color: #e8eff6;
+    padding: 50px 0;
+}
+section.features2 {
+    background-color: #fff;
+    padding: 50px 0;
+    color: #fff;
+}
+.features h1 {
+	font-size:30px;
+    margin-bottom: 40px;
+}
+.howchits-col1 {
+    float: left;
+    width: 25%;
+    height: auto;
+    padding-left: 0px;
+}
+.howchits-col2 {
+    float: left;
+    width: 75%;
+    height: auto;
+    padding-right: 0px;
+}
+.icon-chitsapp {
+    text-align: center;
+    margin: 20px 0px;
+    color: #34005c;
+    font-weight: 500;
+}
+section.stackupapp {
+    background-color: #fffabb;
+    padding: 50px 0px 0px 0px;
+}
+h1{
+	font-size:30px !important;
+	text-align:center !important;
+}
+.icon-features h4{
+	font-size:16px !important;
+	text-align:center !important;
+}
+.footer {
+	float:right;
+    margin:5px 0px 0px 20px;
+}
+section.howchitworks {
+    padding: 35px 0;
+    color: #000;
+}
+.howchitworks h1 {
+	font-size:20px !important;
+    margin: 0px 0px 20px 0px;
+	text-align:left !important;
+	font-weight:500;
+}
+.features2 h1{
+	text-align: left !important;
+}
+p{
+	font-size:13px !important;
+	font-weight:500 !important;
+	line-height:22px !important;
+}
+.team-boxed .people{
+    padding: 20px 0px !important;
+}
+.team-boxed .item .box {
+    text-align: center;
+    padding: 30px;
+    background-color: #fff;
+    margin: 10px 10px 20px 10px !important;
+	height:280px !important;
+}
+.team-boxed h2 {
+    font-weight: 500;
+    margin-bottom: 10px !important;
+    padding-top: 40px;
+    color: inherit;
+}
+.team-boxed .item .name {
+    font-weight: 500;
+	font-size:20px !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+    color: inherit;
+	
+}
+}
+
+
+.my-radio {
+    display: block;
+
+    position: relative;
+    padding: 9px 12px 12px 45px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+    /* Hide the browser's default radio button */
+    .my-radio > input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+/* Create a custom radio button */
+.checkmark {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.my-radio:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.my-radio input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+.my-radio input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+
+.my-radio input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+input[type="radio"]:checked + label.my-radio {
+    background:#2196F3;
+}
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.my-radio input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.my-radio .checkmark:after {
+    top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.font-22 {
+
+    font-size:22px !important;
+}
+
+
+/*input#ctl00_content1_Txt_uid.form-control {
+    background:#fff !important;
+    border:1px solid #ddd !important;
+    border-radius:4px !important;
+}*/
+
+
+input:-webkit-autofill {
+    background-color: transparent !important;
+}
+
+
+
+
+
+
+
+
+/*.modal-dialog {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}*/
+
+#myModal {
+    padding: 0px !important;
+}
+.modal.fade .modal-dialog {
+    transform: translate3d(0, 0, 0);
+}
+
+.bidoffer 
+.modal-body {
+    display:block !important;
+    padding-left:30px !important;
+    padding-right:40px !important;
+}
+.bidoffer
+.close {
+    font-size: 44px !important;
+    position: absolute;
+    right: 9px;
+}
+
+.btn-action {
+    text-align: center !important;
+    width: 50px;
+    text-wrap: initial
+}

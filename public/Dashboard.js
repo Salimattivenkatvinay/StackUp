@@ -38,7 +38,7 @@ async function getBlockNumber() {
 function getEthData() {
     let web3 = new Web3(Web3.givenProvider || 'ws://some.local-or-remote.node:8546');
     console.log("getEthData")
-    let mycontract = new web3.eth.Contract(loanPoolFactory.abi, "0x6EE0dAD2742Debc90f651FEB3D30BDF08049203C")
+    let mycontract = new web3.eth.Contract(stackUpFactoryAbi.abi, "0xa7bA5b6c56578f4F7b15a231b0c5BfDA52c0bE07")
     mycontract.methods.totalPools().call()
         .then(function (result) {
             console.log(result)
@@ -55,96 +55,77 @@ function getEthData() {
 
 $(document).ready(function () {
 
-   /* for (let i = 0; i < 7; i++) {
-        $("#active_table").append(`
-        <tr>
-            <td>${i}</td>
-            <td>${Math.pow(10, i)}</td>
-            <td>${i * 10}</td>
-            <td>1000</td>
-            <td>01/25</td>
-            <td>
-                <button type="button" class="btn btn-primary">Bid</button>
-            </td>
-        </tr>`);
-    }*/
+    /* for (let i = 0; i < 7; i++) {
+         $("#active_table").append(`
+         <tr>
+             <td>${i}</td>
+             <td>${Math.pow(10, i)}</td>
+             <td>${i * 10}</td>
+             <td>1000</td>
+             <td>01/25</td>
+             <td>
+                 <button type="button" class="btn btn-primary">Bid</button>
+             </td>
+         </tr>`);
+     }*/
 
 
-    for (let i = 0; i < 70; i++) {
-        $("#trading_table").append(`
-        <tr>
-            <td>${i}</td>
-            <td>${Math.pow(10, i)}</td>
-            <td>${i * 10}</td>
-            <td>1000</td>
-            <td>1000</td>
-            <td class="dt-control"></td>
-        </tr>`);
-    }
+    // for (let i = 0; i < 70; i++) {
+    //     $("#trading_table").append(`
+    //     <tr>
+    //         <td>${i}</td>
+    //         <td>${Math.pow(10, i)}</td>
+    //         <td>${i * 10}</td>
+    //         <td>1000</td>
+    //         <td>1000</td>
+    //         <td class="dt-control"></td>
+    //     </tr>`);
+    // }
 
-    function format(d) {
-        // `d` is the original data object for the row
-        return `
-        <table class="table table-dark" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
-            <tr>
-                <td>
-                Health facot : .890
-                </td>
-                projected interest : 5%
-                <td>
-                load facot : .890
-                </td>
-                <td>
-                <button type="button" class="btn btn-primary">buy</button>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary">sell</button>
-                </td>
-            <tr>
-        </table>`;
-    }
+    // function format(d) {
+    //     // `d` is the original data object for the row
+    //     return `
+    //     <table class="table table-dark" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+    //         <tr>
+    //             <td>
+    //             Health facot : .890
+    //             </td>
+    //             projected interest : 5%
+    //             <td>
+    //             load facot : .890
+    //             </td>
+    //             <td>
+    //             <button type="button" class="btn btn-primary">buy</button>
+    //             </td>
+    //             <td>
+    //                 <button type="button" class="btn btn-primary">sell</button>
+    //             </td>
+    //         <tr>
+    //     </table>`;
+    // }
 
-    let table = $('#trading_t').DataTable({
-        "scrollX": true,
-        "scrollY": $(window).height() / 2,
-    });
+    // let table = $('#trading_t').DataTable({
+    //     "scrollX": true,
+    //     "scrollY": $(window).height() / 2,
+    // });
 
-    // Add event listener for opening and closing details
-    $('#trading_t tbody').on('click', 'td.dt-control', function () {
-        var tr = $(this).closest('tr');
-        var row = table.row(tr);
+    // // Add event listener for opening and closing details
+    // $('#trading_t tbody').on('click', 'td.dt-control', function () {
+    //     var tr = $(this).closest('tr');
+    //     var row = table.row(tr);
 
-        console.table(row.data())
+    //     console.table(row.data())
 
-        if (row.child.isShown()) {
-            // This row is already open - close it
-            row.child.hide();
-            tr.removeClass('shown');
-        } else {
-            // Open this row
-            row.child(format(row.data())).show();
-            tr.addClass('shown');
-        }
-    });
-
-    for (let i = 0; i < 3; i++) {
-        $("#portfolio_table").append(`
-        <tr>
-            <td>${i}</td>
-            <td>${Math.pow(10, i)}</td>
-            <td>${i * 10}</td>
-            <td>1000</td>
-            <td>01/25</td>
-            <td>
-                <button type="button" class="btn btn-primary">Exit</button>
-            </td>
-        </tr>`);
-    }
-
-    $('#portfolio_t').DataTable({
-        "scrollY": $(window).height() / 2,
-        "scrollX": true
-    });
+    //     if (row.child.isShown()) {
+    //         // This row is already open - close it
+    //         row.child.hide();
+    //         tr.removeClass('shown');
+    //     } else {
+    //         // Open this row
+    //         row.child(format(row.data())).show();
+    //         tr.addClass('shown');
+    //     }
+    // });
 
 
     $("#active").show()
@@ -172,4 +153,25 @@ async function getAccount() {
     showAccount.innerHTML = account;
     $('#enableEthereumBtn').hide()
     getBlockNumber()
+}
+
+
+function placeNewBid() {
+
+
+    $("#bidding_table").append(`
+          <tr>
+                            <td>
+                            1
+                            </td>
+                            <td>
+                            0xdwfegrhtjykuwfegbh
+                            </td>
+                            <td>
+                            $890
+                            </td>
+                            <td>
+                            12:01:01 pm
+                            </td>
+                        </tr>`);
 }
