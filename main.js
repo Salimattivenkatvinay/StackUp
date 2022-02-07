@@ -338,15 +338,15 @@ async function addPosition() {
             const positionAmount = document.getElementById("positionAmount").value
             console.log(positionAmount);
             // if (result) {
-                const orders = new Positions();
-                orders.set("ChitId", chitId);
-                orders.set("PositionId", Date.now());
-                orders.set("Type", "Position");
-                orders.set("Amount", positionAmount);
-                orders.set("Status", "Open");
-                orders.set("UserId", user.get("ethAddress"));
-                orders.set("Term", term);
-                orders.save();
+            const orders = new Positions();
+            orders.set("ChitId", chitId);
+            orders.set("PositionId", Date.now());
+            orders.set("Type", "Position");
+            orders.set("Amount", positionAmount);
+            orders.set("Status", "Open");
+            orders.set("UserId", user.get("ethAddress"));
+            orders.set("Term", term);
+            orders.save();
             // }
         }, (error) => {
             // The object was not retrieved successfully.
@@ -687,6 +687,8 @@ function populatePortfolioChitsTable(chits) {
 
 function chitUserAction(chitId) {
 
+    console.log(userChitStatusMap[chitId])
+
     switch (userChitStatusMap[chitId]) {
         case "Subscribe" :
             populatePortfolioDetBid(chitId)
@@ -719,6 +721,8 @@ function sellPosition(chitId) {
 }
 
 function populatePortfolioDetBid(chitId) {
+
+    console.log("bid")
     $('#portfolio_t_det').empty()
         .show().append(
         `
