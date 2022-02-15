@@ -44,7 +44,7 @@ contract Position {
 
     function cancelSellOrder() public {
         LoanPool loanPoolContract = LoanPool(lpAddress);
-        require(loanPoolContract.getIsparticipant(msg.sender), "you cannot cancel the order");
+        require(loanPoolContract.getIsparticipant(msg.sender), "you cannot cancel the order as you are not part of it");
         require(compareStrings(status, 'Active'), "you cannot cancel the non active orders");
         status = 'Cancelled';
 
@@ -52,15 +52,15 @@ contract Position {
         //emitting updated order book with status completed
     }
 
-    function updateReservePrice(uint newReservePrice) public {
-        LoanPool loanPoolContract = LoanPool(lpAddress);
-        require(loanPoolContract.getIsparticipant(msg.sender), "you cannot update reserve price");
-        require(compareStrings(status, 'Active'), "you cannot cancel the non active orders");
-        reservePrice = newReservePrice;
+    // function updateReservePrice(address lpAddress uint newReservePrice) public {
+    //     LoanPool loanPoolContract = LoanPool(lpAddress);
+    //     require(loanPoolContract.getIsparticipant(msg.sender), "you cannot update reserve price");
+    //     require(compareStrings(status, 'Active'), "you cannot cancel the non active orders");
+    //     reservePrice = newReservePrice;
 
-        emit NewExitOrder(lpAddress, address(this), msg.sender, reservePrice, status, orderType);
-        //emitting updated order book with status completed
-    }
+    //     emit NewExitOrder(lpAddress, address(this), msg.sender, reservePrice, status, orderType);
+    //     //emitting updated order book with status completed
+    // }
 
     function compareStrings(string memory a, string memory b) public pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));

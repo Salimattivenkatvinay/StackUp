@@ -486,6 +486,15 @@ function App(props) {
   const buyTokensEvents = useEventListener(readContracts, "Vendor", "BuyTokens", localProvider, 1);
   console.log("📟 buyTokensEvents:", buyTokensEvents);
 
+  const PoolTransactionsEvents = useEventListener(readContracts, "LoanPool", "PoolTransactions", localProvider, 1);
+  console.log("📟 PoolTransactionsEvents:", PoolTransactionsEvents);
+
+  const PositionEvents = useEventListener(readContracts, "Position", "NewExitOrder", localProvider, 1);
+  console.log("📟 PositionEvents:", PositionEvents);
+
+  const NewLoanPoolEvents = useEventListener(readContracts, "LoanPoolFactory", "NewLoanPool", localProvider, 1);
+  console.log("📟 NewLoanPoolEvents:", NewLoanPoolEvents);
+
   const [tokenBuyAmount, setTokenBuyAmount] = useState({
     valid: false,
     value: ''
@@ -744,6 +753,57 @@ function App(props) {
               />
             </div>
 
+            <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
+              <div>Pool Transaction Events:</div>
+              <List
+                dataSource={PoolTransactionsEvents}
+                renderItem={item => {
+                  return (
+                    <List.Item key={item.blockNumber + item.blockHash}>
+                      <Address value={item.args[1]} ensProvider={mainnetProvider} fontSize={16} /> <b>{item.args[2]}</b> using
+                      <Balance balance={item.args[6]} /> Tokens
+                    </List.Item>
+                  );
+                }}
+              />
+            </div>
+
+
+            <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
+              <div>Position Trade Events:</div>
+              <List
+                dataSource={PositionEvents}
+                renderItem={item => {
+                  return (
+                    <List.Item key={item.blockNumber + item.blockHash}>
+                      Pool_Id
+                      <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} />
+                      Position_Id
+                      <Address value={item.args[1]} ensProvider={mainnetProvider} fontSize={16} /> 
+                      User
+                      <Address value={item.args[2]} ensProvider={mainnetProvider} fontSize={16} /> 
+                      Price
+                      <Balance balance={item.args[3]} />
+                    </List.Item>
+                  );
+                }}
+              />
+            </div>
+
+            <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
+              <div>New Loan Pool Events:</div>
+              <List
+                dataSource={NewLoanPoolEvents}
+                renderItem={item => {
+                  return (
+                    <List.Item key={item.blockNumber + item.blockHash}>
+                      <Address value={item.args[1]} ensProvider={mainnetProvider} fontSize={16} /> LoanPool
+                    </List.Item>
+                  );
+                }}
+              />
+            </div>
+
             {/*
 
                 🎛 this scaffolding is full of commonly used components
@@ -784,6 +844,22 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
+            />
+            <Contract
+            name="Position"
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+            />
+            <Contract
+            name="LoanPoolFactory"
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
             />
           </Route>
         </Switch>

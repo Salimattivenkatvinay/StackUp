@@ -9,7 +9,7 @@ contract Vendor is Ownable {
   event BuyTokens(address buyer, uint256 amountOfETH, uint256 amountOfTokens);
 
   YourToken public yourToken;
-  uint256 constant public tokensPerEth = 100;
+  uint256 constant public tokensPerEth = 1000;
 
 
   constructor(address tokenAddress) {

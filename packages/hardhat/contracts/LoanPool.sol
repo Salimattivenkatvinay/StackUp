@@ -4,7 +4,7 @@ pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // import "./IERC20.sol";
-import "./Positions.sol";
+import "./Position.sol";
 
 
 contract LoanPool {
@@ -14,7 +14,7 @@ contract LoanPool {
     uint256 public collateralAmount; // 1,20,000
     uint256 public installmentAmount; // 10,000
     uint256 public poolStartTimestamp;
-    uint256 public totalParticipants; // total participants.
+    uint256 public totalParticipants=0; // total participants.
     uint256 public auctionInterval; // gap bw wach auction. 1 month
     uint256 public auctionDuration; // how much time aution should happen : 1hr
     uint256 internal loanerCount; //
@@ -59,9 +59,8 @@ contract LoanPool {
         maxParticipants = _maxParticipants;
         auctionInterval = _auctionInterval;
         auctionDuration = _auctionDuration;
-        installmentAmount = _installmentAmount;
-        collateralAmount = (_installmentAmount * _maxParticipants);
-        //        collateralAmount = (12 * _installmentAmount * _maxParticipants) / 10;
+        installmentAmount = _installmentAmount * 10 ** 18;
+        collateralAmount = (12 * installmentAmount * _maxParticipants) / 10;
         poolStartTimestamp = block.timestamp;
     }
 
@@ -74,7 +73,7 @@ contract LoanPool {
             !isParticipant[msg.sender],
             "You have already participated in the pool !!"
         );
-        uint minAmount = (collateralAmount / maxParticipants / 50); // * 10 ** 18;
+        uint minAmount = (5 * collateralAmount / maxParticipants / 100);
         // 2% of  collateral amount
 
         require(
@@ -102,7 +101,7 @@ contract LoanPool {
 
         require(userTermCount[msg.sender] < getAuctionCount(), "already installment paid");
 
-        uint256 termInstallmentAmount = ((installmentAmount - highestBidAmount[getAuctionCount()] / maxParticipants) * 10 ** 18);
+        uint256 termInstallmentAmount = ((installmentAmount - highestBidAmount[getAuctionCount()] / maxParticipants));
 
         require(
             token.transferFrom(
@@ -123,7 +122,7 @@ contract LoanPool {
         uint256 term = getAuctionCount();
         uint256 collateralDeposit = (collateralAmount - (term / totalParticipants) * collateralAmount);
         require(
-            deposit(collateralDeposit * 10 ** 18), //required collateral decreases
+            deposit(collateralDeposit), //required collateral decreases
             "Depositing on lending pool failed !!"
         );
         collateralDeposited[msg.sender] = collateralDeposit;
@@ -131,6 +130,11 @@ contract LoanPool {
     }
 
     function bid(uint256 bidAmount) public {
+
+        require(
+            totalParticipants == maxParticipants,
+            "Pool Not Closed yet !!"
+        );
         require(
             block.timestamp < poolCloseTimestamp(),
             "All auction already complete !!"
@@ -179,7 +183,7 @@ contract LoanPool {
         require(collateralDeposited[msg.sender] > 0, "deposit collateral man!!");
 
         require(
-            withdraw(loanAmount[msg.sender] * 10 ** 18),
+            withdraw(loanAmount[msg.sender]),
             "Withdrawl from lending pool failed !!"
         );
 
@@ -216,7 +220,7 @@ contract LoanPool {
     }
 
     function finalReturnAmount() internal view returns (uint256) {
-        uint minAmount = (collateralAmount / maxParticipants / 50) * 10 ** 18;
+        uint minAmount = (collateralAmount / maxParticipants / 50);
         return collateralDeposited[msg.sender] + minAmount;
         // + some yeild. need to think about this.
     }

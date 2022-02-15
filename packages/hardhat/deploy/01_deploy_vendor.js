@@ -24,7 +24,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   
   const transferTransaction = await yourToken.transfer(
     vendor.address,
-    ethers.utils.parseEther("1000")
+    ethers.utils.parseEther("100000")
   );
 
   //console.log("\n    ✅ confirming...\n");
