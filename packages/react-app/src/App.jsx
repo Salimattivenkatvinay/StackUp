@@ -777,6 +777,14 @@ function App(props) {
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
             />
+            <Contract
+              name="LoanPool"
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
           </Route>
         </Switch>
       </BrowserRouter>

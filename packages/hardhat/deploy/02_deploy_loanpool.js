@@ -9,32 +9,31 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   // You might need the previously deployed yourToken:
   const yourToken = await ethers.getContract("YourToken", deployer);
-
   // Todo: deploy the vendor
-  await deploy("Vendor", {
+  await deploy("LoanPool", {
     from: deployer,
-    args: [yourToken.address], // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    args: [100, 300, 30, 3, yourToken.address], // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     log: true,
   });
-  
-  const vendor = await ethers.getContract("Vendor", deployer);
+  //
+  const LoanPool = await ethers.getContract("LoanPool", deployer);
 
   // Todo: transfer the tokens to the vendor
-  console.log("\n 🏵  Sending all 1000 tokens to the vendor...\n");
-  
-  const transferTransaction = await yourToken.transfer(
-    vendor.address,
-    ethers.utils.parseEther("1000")
-  );
+  console.log("\n 🏵  LoanPool deployed at ...\n", LoanPool.address);
+  //
+//   const transferTransaction = await yourToken.transfer(
+//     vendor.address,
+//     ethers.utils.parseEther("1000")
+//   );
 
-  //console.log("\n    ✅ confirming...\n");
-  //await sleep(5000); // wait 5 seconds for transaction to propagate
+//   console.log("\n    ✅ confirming...\n");
+//   await sleep(5000); // wait 5 seconds for transaction to propagate
 
-  // ToDo: change address to your frontend address vvvv
-  // console.log("\n 🤹  Sending ownership to frontend address...\n")
-  // const ownershipTransaction = await vendor.transferOwnership("** YOUR FRONTEND ADDRESS **");
-  // console.log("\n    ✅ confirming...\n");
-  // const ownershipResult = await ownershipTransaction.wait();
+//   // ToDo: change address to your frontend address vvvv
+//   console.log("\n 🤹  Sending ownership to frontend address...\n")
+//   const ownershipTransaction = await vendor.transferOwnership("0x370764353b52AaaC957648981DFE0c7151443B6B");
+//   console.log("\n    ✅ confirming...\n");
+//   const ownershipResult = await ownershipTransaction.wait();
 
   // ToDo: Verify your contract with Etherscan for public chains
   // if (chainId !== "31337") {
@@ -56,4 +55,4 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-module.exports.tags = ["Vendor"];
+module.exports.tags = ["LoanPool"];
